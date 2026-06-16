@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>칼럼 콘텐츠 검사기</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+    <h1>칼럼 콘텐츠 검사기</h1>
+    <p class="subtitle">19세 미만 학생 대상 칼럼의 유해성 및 적합성을 검사합니다.</p>
+
+    <div class="card">
+      <div class="tab-group">
+        <button class="tab-btn active" data-tab="text">텍스트 붙여넣기</button>
+        <button class="tab-btn" data-tab="url">URL 입력</button>
+      </div>
+
+      <div id="tab-text" class="input-area active">
+        <textarea id="input-text" placeholder="검사할 칼럼 본문을 붙여넣으세요..."></textarea>
+      </div>
+      <div id="tab-url" class="input-area">
+        <input type="url" id="input-url" placeholder="https://example.com/article/..." />
+      </div>
+
+      <button class="btn-check" id="btn-check">검사하기</button>
+    </div>
+
+    <div id="loading"><span class="spinner"></span>AI가 분석 중입니다...</div>
+    <div class="error-box" id="error-box"></div>
+
+    <div id="result">
+      <div class="card">
+        <div id="verdict-badge"></div>
+        <div id="violations-container"></div>
+      </div>
+      <p class="disclaimer">⚠️ AI 판단은 참고용이며 최종 확인은 담당자가 직접 해주세요. 본 도구의 판단 결과에 대한 법적·정책적 책임은 사용자에게 있습니다.</p>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

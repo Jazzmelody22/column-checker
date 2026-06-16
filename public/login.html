@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>로그인 — 칼럼 콘텐츠 검사기</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .login-card {
+      width: 100%;
+      max-width: 360px;
+    }
+    .login-title {
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    .login-sub {
+      font-size: 0.88rem;
+      color: #666;
+      margin-bottom: 24px;
+    }
+    .login-field {
+      margin-bottom: 12px;
+    }
+    .login-field label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #444;
+      margin-bottom: 6px;
+    }
+    .login-error {
+      background: #fff1f2;
+      border: 1.5px solid #fda4af;
+      border-radius: 8px;
+      padding: 10px 14px;
+      color: #9f1239;
+      font-size: 0.88rem;
+      margin-bottom: 14px;
+      display: none;
+    }
+    .login-error.visible { display: block; }
+  </style>
+</head>
+<body>
+  <div class="card login-card">
+    <div class="login-title">칼럼 콘텐츠 검사기</div>
+    <div class="login-sub">접근하려면 비밀번호를 입력하세요.</div>
+    <div class="login-error" id="login-error">비밀번호가 올바르지 않습니다.</div>
+    <form method="POST" action="/login">
+      <div class="login-field">
+        <label for="password">비밀번호</label>
+        <input type="password" id="password" name="password"
+               autofocus autocomplete="current-password"
+               style="width:100%;padding:11px 14px;border:1.5px solid #d0d5dd;border-radius:8px;font-size:0.95rem;outline:none;font-family:inherit;" />
+      </div>
+      <button class="btn-check" type="submit">로그인</button>
+    </form>
+  </div>
+  <script>
+    if (new URLSearchParams(location.search).get('error')) {
+      document.getElementById('login-error').classList.add('visible');
+    }
+  </script>
+</body>
+</html>
