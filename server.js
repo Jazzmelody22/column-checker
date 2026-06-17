@@ -88,18 +88,18 @@ app.post('/api/check', async (req, res) => {
     return res.status(500).json({ error: `규칙 검사 오류: ${err.message}` });
   }
 
-  let aiViolations = [];
+let aiResult = { violations: [], summary: null };
   try {
-    aiViolations = await runAiCheck(text);
+    aiResult = await runAiCheck(text);
   } catch (err) {
     return res.status(500).json({ error: `AI 검사 오류: ${err.message}` });
   }
-
-  const violations = [...ruleViolations, ...aiViolations];
+  const violations = [...ruleViolations, ...aiResult.violations];
   const overall = violations.length === 0 ? '적합' : '부적합';
-
-  res.json({ overall, violations });
+ 
+ res.json({ overall, violations, summary: aiResult.summary });
 });
+
 
 app.listen(PORT, () => {
   console.log(`서버 실행 중: http://localhost:${PORT}`);

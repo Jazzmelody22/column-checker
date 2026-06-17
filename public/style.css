@@ -219,3 +219,62 @@ input[type="url"]:focus { border-color: #2563eb; }
   font-size: 0.9rem;
   display: none;
 }
+.summary-box {
+  margin-top: 12px;
+  padding: 14px 16px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+}
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+.summary-label {
+  font-size: 0.85rem;
+  color: #64748b;
+}
+.summary-value {
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: #2563eb;
+}
+.summary-tag {
+  background: #e0e7ff;
+  color: #4338ca;
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 999px;
+}
+.summary-tag-bold {
+  font-weight: 800;
+}
+.summary-comment {
+  margin-top: 8px;
+  font-size: 0.9rem;
+  color: #334155;
+  line-height: 1.5;
+}
+.summary-comment-bold {
+  font-weight: 700;
+}
+.summary-spacer {
+  height: 16px;
+}
+.summary-content-bold {
+  font-weight: 700;
+}
+.summary-content-title {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #64748b;
+  margin-bottom: 4px;
+}
+.summary-content-text {
+  font-size: 0.88rem;
+  color: #334155;
+  line-height: 1.55;
+}

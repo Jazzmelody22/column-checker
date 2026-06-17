@@ -82,6 +82,25 @@ function renderResult(data) {
   const isPass = data.overall === '적합';
   verdictEl.innerHTML = `<div class="verdict ${isPass ? 'pass' : 'fail'}">${isPass ? '✅ 적합' : '❌ 부적합'}</div>`;
 
+if (data.summary) {
+    verdictEl.innerHTML += `
+      <div class="summary-box">
+        <div class="summary-row">
+          <span class="summary-label">학습 관련 비율</span>
+          <span class="summary-value">${data.summary.studyRelatedPercent}%</span>
+        </div>
+        <div class="summary-row">
+          <span class="summary-label">콘텐츠 성격</span>
+          <span class="summary-tag summary-tag-bold">${esc(data.summary.category)}</span>
+        </div>
+        <div class="summary-comment summary-comment-bold">${esc(data.summary.comment)}</div>
+        <div class="summary-spacer"></div>
+        <div class="summary-content-title">내용 요약</div>
+        <div class="summary-content-text summary-content-bold">${esc(data.summary.contentSummary)}</div>
+      </div>`;
+  }
+
+
   if (isPass) {
     container.innerHTML = '<p style="color:#16a34a;font-size:0.95rem;">위반 항목이 발견되지 않았습니다.</p>';
   } else {
