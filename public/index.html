@@ -34,8 +34,31 @@
       <div class="card">
         <div id="verdict-badge"></div>
         <div id="violations-container"></div>
+        <div id="image-results-container"></div> 
       </div>
       <p class="disclaimer">⚠️ AI 판단은 참고용이며 최종 확인은 담당자가 직접 해주세요. 본 도구의 판단 결과에 대한 법적·정책적 책임은 사용자에게 있습니다.</p>
+      <!-- 쪽지 작성 섹션 -->
+    <div id="message-section" style="display:none;">
+      <div class="card">
+        <p class="section-title">📨 쪽지 작성</p>
+        <div class="message-type-group">
+          <button class="msg-type-btn" data-type="수정">수정 요청</button>
+          <button class="msg-type-btn" data-type="지양">지양 안내</button>
+          <button class="msg-type-btn" data-type="삭제">삭제 안내</button>
+          <button class="msg-type-btn" data-type="글자수미달">글자수 미달</button>
+        </div>
+        <button class="btn-check" id="btn-generate-msg" style="margin-top:12px;" disabled>
+          쪽지 생성하기
+        </button>
+        <div id="message-loading" style="display:none;text-align:center;padding:16px;color:#555;">
+          <span class="spinner"></span>쪽지 작성 중...
+        </div>
+        <div id="message-output" style="display:none;">
+          <textarea id="message-text" style="height:260px;margin-top:14px;background:#f8fafc;"></textarea>
+          <button class="btn-copy" id="btn-copy-msg">📋 복사하기</button>
+        </div>
+      </div>
+    </div>
     </div>
   </div>
 

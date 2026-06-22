@@ -5,6 +5,7 @@ const path = require('path');
 const { extractTextFromUrl } = require('./lib/extractText');
 const { runRuleFilter } = require('./lib/ruleFilter');
 const { runAiCheck } = require('./lib/aiCheck');
+const { runImageCheck } = require('./lib/imageCheck');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -65,22 +66,27 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.post('/api/check', async (req, res) => {
   const { type, content } = req.body;
-
   if (!type || !content || !content.trim()) {
     return res.status(400).json({ error: '입력값이 없습니다.' });
   }
 
   let text;
+  let imageUrls = [];
+  let title = '';  
+
   if (type === 'url') {
     try {
-      text = await extractTextFromUrl(content.trim());
+      // ✅ { text, imageUrls } 구조로 받기
+      ({ text, imageUrls, title } = await extractTextFromUrl(content.trim()));
     } catch (err) {
       return res.status(422).json({ error: err.message });
     }
   } else {
     text = content.trim();
+    // 직접 입력은 이미지 없음
   }
 
+  // 텍스트 규칙 검사
   let ruleViolations = [];
   try {
     ruleViolations = runRuleFilter(text);
@@ -88,16 +94,44 @@ app.post('/api/check', async (req, res) => {
     return res.status(500).json({ error: `규칙 검사 오류: ${err.message}` });
   }
 
-let aiResult = { violations: [], summary: null };
+  // 텍스트 AI 검사
+  let aiResult = { violations: [], summary: null };
   try {
     aiResult = await runAiCheck(text);
   } catch (err) {
     return res.status(500).json({ error: `AI 검사 오류: ${err.message}` });
   }
+
+  // ✅ 이미지 검사 (URL 입력 + 이미지 존재 시)
+  let imageResults = [];
+  if (type === 'url' && imageUrls.length > 0) {
+    try {
+      imageResults = await runImageCheck(imageUrls);
+    } catch (err) {
+      // 이미지 검사 실패해도 텍스트 결과는 반환
+      imageResults = [{ error: `이미지 검사 오류: ${err.message}` }];
+    }
+  }
+
   const violations = [...ruleViolations, ...aiResult.violations];
-  const overall = violations.length === 0 ? '적합' : '부적합';
- 
- res.json({ overall, violations, summary: aiResult.summary });
+  const hasHarmfulImage = imageResults.some((r) => r.harmful);
+  const overall =
+    violations.length === 0 && !hasHarmfulImage ? '적합' : '부적합';
+
+  res.json({ overall, violations, summary: aiResult.summary, imageResults, title });
+});
+
+const { generateMessage } = require('./lib/messageGen');
+
+app.post('/api/message', async (req, res) => {
+  const { title, messageType, violations, imageResults } = req.body;
+  if (!messageType) return res.status(400).json({ error: '쪽지 유형을 선택하세요.' });
+  try {
+    const message = await generateMessage({ title, messageType, violations, imageResults });
+    res.json({ message });
+  } catch (err) {
+    res.status(500).json({ error: `쪽지 생성 오류: ${err.message}` });
+  }
 });
 
 

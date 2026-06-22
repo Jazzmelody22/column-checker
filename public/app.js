@@ -124,4 +124,115 @@ if (data.summary) {
 
   resultEl.style.display = 'block';
   resultEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  renderImageResults(data.imageResults);
+ initMessageSection(data);
 }
+
+function renderImageResults(imageResults) {
+  const container = document.getElementById('image-results-container');
+  if (!container) return; 
+  if (!imageResults || imageResults.length === 0) {
+    container.innerHTML = '';
+    return;
+  }
+
+  const harmful = imageResults.filter((r) => r.harmful);
+  const failed = imageResults.filter((r) => r.error);
+
+  let html = `
+    <div style="margin-top:20px;">
+      <p class="section-title">🖼️ 이미지 검사 결과 (${imageResults.length}장 중 유해 ${harmful.length}건)</p>`;
+
+  if (harmful.length === 0) {
+    html += `<p style="color:#16a34a;font-size:0.95rem;margin-bottom:8px;">유해 이미지가 발견되지 않았습니다.</p>`;
+  }
+
+  harmful.forEach((img) => {
+    html += `
+      <div class="image-result-card">
+        <img class="image-thumb" src="${esc(img.url)}" alt="유해 이미지"
+             onerror="this.style.display='none'" />
+        <div class="image-result-body">
+          <div class="image-result-header">
+            <span class="badge-harmful">⚠️ 유해</span>
+            ${(img.categories || []).map((c) => `<span class="badge-img-cat">${esc(c)}</span>`).join('')}
+          </div>
+          <div class="violation-field" style="margin-top:6px;">
+            <strong>판단 근거:</strong> ${esc(img.reason || '')}
+          </div>
+        </div>
+      </div>`;
+  });
+
+  if (failed.length > 0) {
+    html += `<p style="color:#94a3b8;font-size:0.83rem;margin-top:8px;">분석 실패 이미지: ${failed.length}장</p>`;
+  }
+
+  html += `</div>`;
+  container.innerHTML = html;
+}
+
+// 쪽지 작성 관련
+let lastCheckData = null;
+let selectedMsgType = null;
+
+function initMessageSection(data) {
+  lastCheckData = data;
+  selectedMsgType = null;
+  document.getElementById('message-section').style.display = 'block';
+  document.getElementById('message-output').style.display = 'none';
+  document.getElementById('btn-generate-msg').disabled = true;
+  document.querySelectorAll('.msg-type-btn').forEach((btn) => {
+    btn.classList.remove('active');
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.msg-type-btn').forEach((b) => b.classList.remove('active'));
+      btn.classList.add('active');
+      selectedMsgType = btn.dataset.type;
+      document.getElementById('btn-generate-msg').disabled = false;
+    });
+  });
+}
+
+document.getElementById('btn-generate-msg').addEventListener('click', async () => {
+  if (!selectedMsgType || !lastCheckData) return;
+
+  const btn = document.getElementById('btn-generate-msg');
+  const loadingEl = document.getElementById('message-loading');
+  const outputEl = document.getElementById('message-output');
+
+  btn.disabled = true;
+  loadingEl.style.display = 'block';
+  outputEl.style.display = 'none';
+
+  try {
+    const res = await fetch('/api/message', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        title: lastCheckData.title || '',
+        messageType: selectedMsgType,
+        violations: lastCheckData.violations || [],
+        imageResults: lastCheckData.imageResults || [],
+      }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || '쪽지 생성 실패');
+
+    document.getElementById('message-text').value = data.message;
+    outputEl.style.display = 'block';
+  } catch (err) {
+    alert('오류: ' + err.message);
+  } finally {
+    btn.disabled = false;
+    loadingEl.style.display = 'none';
+  }
+});
+
+document.getElementById('btn-copy-msg').addEventListener('click', () => {
+  const text = document.getElementById('message-text').value;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.getElementById('btn-copy-msg');
+    btn.textContent = '✅ 복사됨!';
+    setTimeout(() => (btn.textContent = '📋 복사하기'), 2000);
+  });
+});
